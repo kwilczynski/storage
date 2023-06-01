@@ -1874,6 +1874,9 @@ func (d *Driver) ApplyDiffFromStagingDirectory(id, parent, stagingDirectory stri
 	if err := os.RemoveAll(diff); err != nil && !os.IsNotExist(err) {
 		return err
 	}
+
+	diffOutput.UncompressedDigest = diffOutput.TOCDigest
+
 	return os.Rename(stagingDirectory, diff)
 }
 
