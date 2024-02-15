@@ -160,6 +160,15 @@ func GetTOCDigest(annotations map[string]string) (*digest.Digest, error) {
 
 // GetDiffer returns a differ than can be used with ApplyDiffWithDiffer.
 func GetDiffer(ctx context.Context, store storage.Store, blobSize int64, annotations map[string]string, iss ImageSourceSeekable) (graphdriver.Differ, error) {
+	storeOpts, err := types.DefaultStoreOptionsAutoDetectUID()
+	if err != nil {
+		return nil, err
+	}
+
+	if !parseBooleanPullOption(&storeOpts, "enable_partial_images", true) {
+		return nil, errors.New("enable_partial_images not configured")
+	}
+
 	if _, ok := annotations[internal.ManifestChecksumKey]; ok {
 		return makeZstdChunkedDiffer(ctx, store, blobSize, annotations, iss)
 	}
@@ -1337,10 +1346,6 @@ func (c *chunkedDiffer) ApplyDiff(dest string, options *archive.TarOptions) (gra
 	storeOpts, err := types.DefaultStoreOptionsAutoDetectUID()
 	if err != nil {
 		return output, err
-	}
-
-	if !parseBooleanPullOption(&storeOpts, "enable_partial_images", true) {
-		return output, errors.New("enable_partial_images not configured")
 	}
 
 	// When the hard links deduplication is used, file attributes are ignored because setting them
