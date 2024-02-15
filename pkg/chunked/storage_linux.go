@@ -1339,7 +1339,7 @@ func (c *chunkedDiffer) ApplyDiff(dest string, options *archive.TarOptions) (gra
 		return output, err
 	}
 
-	if !parseBooleanPullOption(&storeOpts, "enable_partial_images", false) {
+	if !parseBooleanPullOption(&storeOpts, "enable_partial_images", true) {
 		return output, errors.New("enable_partial_images not configured")
 	}
 
